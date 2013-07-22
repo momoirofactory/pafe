@@ -10,6 +10,8 @@ window.onload = function() {
 		success:handleTotal,
 	});
 	updatedate();
+	status_barcodereader();
+	status_cardreader();
 }
 function handleUnregisted(response) {
 	$("#unregisted").text(response);
@@ -34,44 +36,49 @@ function handleDate (response) {
 // barcode
 function status_barcodereader() {
 
-        $.ajax({
-                url:"'.$html->url('/users/status_barcodereader').'",
-                success:handleBarcodereader,
-        });
-}
-function handleBarcodereader(response) {
-        var res = null;
-
-        try {
-                res = $.parseJSON(response);
-
-
-                $("#status_barcodereader").text = res.message;
-
-        } catch (e) {
-        }
+	$.ajax({
+		url:"'.$html->url('/users/status_barcodereader').'",
+	}).done(function(data, status, xhr) {
+		var datas = JSON.parse(data);
+		$("#status_barcodereader").toggleClass("btn-info", false);
+		if (datas["status"] == "btn-success") {
+			$("#status_barcodereader").toggleClass("btn-warning", false);
+		} else if (datas["status"] == "btn-warning") {
+			$("#status_barcodereader").toggleClass("btn-success", false);
+		}
+	       	$("#status_barcodereader").addClass(datas["status"]);
+		$("#status_barcodereader").text(datas["message"]);
+	}).fail(function(xhr, status, error) {
+		// 通信失敗
+		setTimeout("status_barcodereader()", 2000);
+	}).always(function(arg1, status, arg2) {
+		// 通信完了
+		setTimeout("status_barcodereader()", 1000);
+	});;
 }
 
 // cardreader
 function status_cardreader() {
 
-        $.ajax({
-                url:"'.$html->url('/users/status_cardreader').'",
-                success:handleCardreader,
-        });
-}
-function handleCardreader(response) {
-        var res = null;
-
-        try {
-                res = $.parseJSON(response);
-
-                $("#status_cardreader").text = res.message;
-
-                $("#status_cardreader").text = res.status;
-
-        } catch (e) {
-        }
+	$.ajax({
+		url:"'.$html->url('/users/status_cardreader').'",
+	}).done(function(data, status, xhr) {
+		var datas = JSON.parse(data);
+		$("#status_cardreader").toggleClass("btn-info", false);
+		if (datas["status"] == "btn-success") {
+			$("#status_cardreader").toggleClass("btn-warning", false);
+		} else if (datas["status"] == "btn-warning") {
+			$("#status_cardreader").toggleClass("btn-success", false);
+		}
+	       	$("#status_cardreader").addClass(datas["status"]);
+		$("#status_cardreader").text(datas["message"]);
+	}).fail(function(xhr, status, error) {
+		// 通信失敗
+		setTimeout("status_barcodereader()", 2000);
+	}).always(function(arg1, status, arg2) {
+		// 通信完了
+		setTimeout("status_cardreader()", 1000);
+	});;
 }
 
 ';
@@ -86,11 +93,11 @@ $javascript->codeBlock($js, array('inline'=>false));
 <div style="float:right;text-align:right;margin-top:4px">
 <div class="btn-group" style="margin:2px">
 <span class="btn btn-inverse" style="font-weight:bold">ICカードリーダー</span>
-<button class="btn btn-success" id="status_cardreader" onclick="return status_cardreader();">稼働中</button>
+<button class="btn btn-info" id="status_cardreader" onclick="return status_cardreader();">確認中</button>
 </div><br/>
 <div class="btn-group" style="margin:2px">
 <span class="btn btn-inverse" style="font-weight:bold">バーコードリーダー</span>
-<span class="btn btn-success" id="status_barcodereader" onclick="return status_barcodereader();">稼働中</span>
+<span class="btn btn-info" id="status_barcodereader" onclick="return status_barcodereader();">確認中</span>
 </div>
 </div>
 <div style="clear:both"></div>
@@ -114,6 +121,11 @@ $javascript->codeBlock($js, array('inline'=>false));
 	<h2><?php echo $html->image('/img/wanpug/image4481.gif') . $html->link('生徒一覧', '/users/lists'); ?></h2>
 	生徒数： ( <span id="total" name="total" class="em"> - </span> 人)
 	<p>生徒の一覧や、今月の出席を確認できます</p>
+</div>
+
+<div class="span4">
+	<h2><?php echo $html->image('/img/wanpug/image4481.gif') . $html->link('会員証作成', '/users/print'); ?></h2>
+	<p>会員証のPDFファイルを作成します。印刷してご利用ください</p>
 </div>
 
 <div class="span4">

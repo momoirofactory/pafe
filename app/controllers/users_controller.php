@@ -3,9 +3,9 @@ class UsersController extends AppController {
 
 	var $name = 'Users';
 	var $helpers = array('Html', 'Session', 'Javascript');
-	var $uses = array('users', 'data');
+	var $uses = array('users', 'data', 'devices');
 
-	// 生徒登録
+	// 生徒登録画面
 	public function index() {
 		$results = $this->_unregist();
 
@@ -13,13 +13,16 @@ class UsersController extends AppController {
 		$this->set('datas', $results);
 	}
 
-
-	// 生徒一覧
+	// 生徒一覧画面
 	public function lists() {
 		$results = $this->_regist();
 
 		//var_dump($results);
 		$this->set('datas', $results);
+	}
+
+	// PDF出力画面
+	public function pdf() {
 	}
 
 	// 未登録カード数API
@@ -48,8 +51,10 @@ class UsersController extends AppController {
                 $this->autoRender = false;
                 $this->layout = 'ajax';
 
-                $res['status'] = 'btn-success';
-                $res['message'] = '稼働中！';
+		$scanner = $this->devices->scanner();
+
+                $res['status'] = $scanner ? 'btn-success' : 'btn-warning';
+                $res['message'] = $scanner ? '接続中' : '未接続';
 
                 echo json_encode($res);
         }
@@ -59,8 +64,10 @@ class UsersController extends AppController {
                 $this->autoRender = false;
                 $this->layout = 'ajax';
 
-                $res['status'] = 'btn-success';
-                $res['message'] = '稼働中？';
+		$reader = $this->devices->reader();
+
+                $res['status'] = $reader ? 'btn-success' : 'btn-warning';
+                $res['message'] = $reader ? '接続中' : '未接続';
 
                 echo json_encode($res);
         }
